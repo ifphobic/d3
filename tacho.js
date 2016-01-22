@@ -33,7 +33,7 @@ Tacho.prototype.initialize = function( id, size ) {
       .attr("class", "tachoBorderOut")
       .attr("cx", 0)
       .attr("cy", 0)
-      .attr("r", this.radius + 6);
+      .attr("r", this.radius + 4);
 
    tacho.append("circle")
       .attr("class", "tachoBorderIn")
@@ -90,7 +90,7 @@ Tacho.prototype.initialize = function( id, size ) {
       .attr("class", "tachoNeedle")
       .attr("transform", "rotate( " + (Tacho.ROTATION[0]) + " )")
       .append("polygon")
-      .attr("points", "0,-5 " + (this.radius - Tacho.PADDING[2]) + ",0 0,5" );
+      .attr("points", "0,-4 " + (this.radius - Tacho.PADDING[2]) + ",0 0,4" );
    
    this.tacho = tacho;
    this.oldValue = 0;
@@ -158,7 +158,6 @@ Tacho.prototype.update = function( value, maxValue ) {
 Tacho.prototype.calculateOvershootValue = function( value, index ) {
    
    var overshootValue = Tacho.OVERSHOOT_VALUE * (value - this.oldValue);
-   console.log(value + overshootValue / Math.pow(-1.5, index));
    return value + overshootValue / Math.pow(-1.5, index);
 }
 
@@ -166,10 +165,8 @@ Tacho.prototype.createInterpolate = function( oldValue, value, diffAngle, noChec
    var oldAngle = diffAngle * oldValue;
    var newAngle = diffAngle * value;
    if ( noCheck || Math.abs(oldAngle - newAngle) > Tacho.OVERSHOOT_VALUE_MIN) {
-      console.log( oldValue + "  ---  "+  newAngle );
       return d3.interpolateNumber(diffAngle * oldValue, diffAngle * value);
    }
-   console.log(" xxxxxxxxxxxxxxxxxxxxxxxxxxx ");
    return null;
 }
 

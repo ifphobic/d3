@@ -5,7 +5,7 @@
 }
 
 .tachoNeedle, .tachoValueRect, .tachoBorderOut {
-  stroke-width: 3px;
+  stroke-width: 2px;
   stroke: #8888aa;
   fill: #000066;
 }
