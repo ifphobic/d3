@@ -1,0 +1,52 @@
+.axis path,
+.axis line {
+  fill: none;
+  stroke-width: 2px;
+  stroke: #8888aa;
+  shape-rendering: crispEdges;
+}
+
+.legend {
+   fill: #eeeeff;
+}
+
+text {
+   fill: #6666aa;
+}
+
+.bar0 {
+   fill: #88cc88;
+}
+.bar1 {
+   fill: #cc8888; 
+}
+.bar2 {
+   fill: #8888ff;
+}
+.bar3 {
+   fill: #ffcc88;
+}
+
+.line {
+   fill: none;
+   stroke: #ffcc88;
+   stroke-width: 5px;
+}
+
+svg {
+   background-color: white;
+}
+
+.title {
+   font-weight: bold;
+   font-size: 30px;
+   font-family: Sans-Serif;
+   fill: #8888aa;
+}
+
+.subTitle {
+   font-weight: normal;
+   font-size: 20px;
+   font-family: Sans-Serif;
+   fill: #8888aa;
+}

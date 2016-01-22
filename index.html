@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<link rel="stylesheet" type="text/css" href="chart.css" ></link>
+<link rel="stylesheet" type="text/css" href="tacho.css" ></link>
+
+<script src="lib/d3.min.js" ></script>
+<script src="chart.js" ></script>
+<script src="tacho.js" ></script>
+<script>
+
+
+function randomInt(max) {
+   return Math.floor((Math.random() * (max + 1)) ); 
+}
+
+function load() {
+   var chart = initializeChart("chart", 1200, 600);
+   var timer = startLoading( chart );
+   
+   var tacho = new Tacho(); 
+   tacho.initialize("tacho0", 400); 
+   tacho.update(75, 150);
+   
+
+   setTimeout(stopLoading, 7000, chart, timer);
+}
+</script>
+
+<body onload="load()">
+
+   <svg id="tacho0"></svg>
+
+   <svg id="chart" ></svg>
+
+</body>
