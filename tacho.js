@@ -9,7 +9,10 @@ Tacho.TICK = 10;
 Tacho.BAR_VALUE=[40, 40, 20];
 Tacho.BAR_COLOR=["red", "yellow", "green"];
 Tacho.BAR_WIDTH=20;
-Tacho.CHANGE_DURATION = 1000;
+Tacho.CHANGE_DURATION = 2000;
+Tacho.OVERSHOOT_DURATION = 300;
+Tacho.OVERSHOOT_VALUE = 0.06;
+Tacho.OVERSHOOT_VALUE_MIN = 1;
 
 Tacho.prototype.initialize = function( id, size ) {
    var svg = d3.select( "#" + id )
@@ -27,7 +30,13 @@ Tacho.prototype.initialize = function( id, size ) {
       .attr("transform", "translate(" + (Tacho.MARGIN.left + this.radius) + "," + (Tacho.MARGIN.top + this.radius) + ")");
 
    tacho.append("circle")
-      .attr("class", "tachoBorder")
+      .attr("class", "tachoBorderOut")
+      .attr("cx", 0)
+      .attr("cy", 0)
+      .attr("r", this.radius + 6);
+
+   tacho.append("circle")
+      .attr("class", "tachoBorderIn")
       .attr("cx", 0)
       .attr("cy", 0)
       .attr("r", this.radius);
@@ -60,23 +69,39 @@ Tacho.prototype.initialize = function( id, size ) {
    tacho.append("path")
       .attr("class", "tachoScale")
        .attr("d", arc);
+   tacho.append("g").attr("id", "tachoScaleGroup");
 
-   tacho.append("line")
+   var valueText = tacho.append("g")
+      .attr("transform", "translate(0, 80)");
+
+   valueText.append("rect")
+      .attr("class", "tachoValueRect")
+      .attr("width", 80)
+      .attr("height", 30);
+      
+   valueText.append("text")
+      .attr("class", "tachoValue")
+      .attr("text-anchor", "end")
+      .attr("x", 70)
+      .attr("y", 24)
+      .text("0");
+
+   tacho.append("g")
       .attr("class", "tachoNeedle")
-      .attr("x1", 0)
-      .attr("y1", 0)
-      .attr("x2", this.radius - Tacho.PADDING[2])
-      .attr("y2", 0)
-      .attr("transform", "rotate( " + (Tacho.ROTATION[0]) + " )");
-
+      .attr("transform", "rotate( " + (Tacho.ROTATION[0]) + " )")
+      .append("polygon")
+      .attr("points", "0,-5 " + (this.radius - Tacho.PADDING[2]) + ",0 0,5" );
+   
    this.tacho = tacho;
+   this.oldValue = 0;
 }
 
 Tacho.prototype.update = function( value, maxValue ) {
    
-   var tacho = this.tacho;
-   tacho.selectAll(".tachoTick").remove();
-   tacho.selectAll(".tachoTickLabel").remove();
+   var tacho= this.tacho;
+   var tachoGroup = tacho.select("#tachoScaleGroup");
+   tachoGroup.selectAll(".tachoTick").remove();
+   tachoGroup.selectAll(".tachoTickLabel").remove();
 
    var angle = ( Tacho.ROTATION[1] - Tacho.ROTATION[0] ) / Tacho.TICK_COUNT;
    var labelRadius = this.radius - Tacho.PADDING[1];
@@ -84,7 +109,7 @@ Tacho.prototype.update = function( value, maxValue ) {
    var diffAngle = diffAngle =  ( Tacho.ROTATION[1] - Tacho.ROTATION[0] ) / maxValue;
    var diffLabel = maxValue / Tacho.TICK_COUNT;
    for( var i = 0; i <= Tacho.TICK_COUNT; i++ ) {
-      tacho.append("line")
+      tachoGroup.append("line")
          .attr("class", "tachoTick")
          .attr("x1", this.scaleRadius - Tacho.TICK)
          .attr("y1", 0)
@@ -92,7 +117,7 @@ Tacho.prototype.update = function( value, maxValue ) {
          .attr("y2", 0)
          .attr("transform", "rotate( " + ( Tacho.ROTATION[0] + i * angle ) + " )");
       
-      tacho.append('text')
+      tachoGroup.append('text')
          .attr("class", "tachoTickLabel")
          .attr("text-anchor","middle")
          .attr("x", labelRadius * Math.sin( this.toRadiant( Tacho.ROTATION[0] + i * angle ) ) )
@@ -101,9 +126,58 @@ Tacho.prototype.update = function( value, maxValue ) {
          
    }
 
-   tacho.select(".tachoNeedle").transition().duration(Tacho.CHANGE_DURATION)
-      .attr("transform", "rotate( " + (Tacho.ROTATION[0] + (diffAngle * value)) + " )");
+   var oldValue = this.oldValue;
+   tacho.select(".tachoValue")
+      .transition()
+      .duration(Tacho.CHANGE_DURATION)
+      .tween( "text", function() {
+          var interpolator = d3.interpolateRound( oldValue, value );
+          return function( t ) {
+               this.textContent = interpolator( t );
+          };
+      } );
+   
+   var overshootDuration = Tacho.OVERSHOOT_DURATION;
+   var overshootStart = Tacho.CHANGE_DURATION;
 
+   var index = 1;
+   var interpolate = this.createInterpolate(this.calculateOvershootValue(value, index-1), this.calculateOvershootValue(value, index), diffAngle, true);
+   while (interpolate != null ) {
+      setTimeout( this.updateNeedleValue, overshootStart, tacho, overshootDuration, interpolate); 
+      index++;
+      interpolate = this.createInterpolate(this.calculateOvershootValue(value, index-1), this.calculateOvershootValue(value, index), diffAngle, false);
+      overshootStart += overshootDuration;
+      overshootDuration /= 1.5;
+   }
+   setTimeout( this.updateNeedleValue, overshootStart, tacho, overshootDuration, this.createInterpolate(this.calculateOvershootValue(value, index-1), value, diffAngle, true)); 
+   this.updateNeedleValue(tacho, Tacho.CHANGE_DURATION, this.createInterpolate(oldValue, this.calculateOvershootValue(value, 0), diffAngle, true ) );
+
+   this.oldValue = value;
+}
+
+Tacho.prototype.calculateOvershootValue = function( value, index ) {
+   
+   var overshootValue = Tacho.OVERSHOOT_VALUE * (value - this.oldValue);
+   console.log(value + overshootValue / Math.pow(-1.5, index));
+   return value + overshootValue / Math.pow(-1.5, index);
+}
+
+Tacho.prototype.createInterpolate = function( oldValue, value, diffAngle, noCheck ) {
+   var oldAngle = diffAngle * oldValue;
+   var newAngle = diffAngle * value;
+   if ( noCheck || Math.abs(oldAngle - newAngle) > Tacho.OVERSHOOT_VALUE_MIN) {
+      console.log( oldValue + "  ---  "+  newAngle );
+      return d3.interpolateNumber(diffAngle * oldValue, diffAngle * value);
+   }
+   console.log(" xxxxxxxxxxxxxxxxxxxxxxxxxxx ");
+   return null;
+}
+
+Tacho.prototype.updateNeedleValue = function( tacho, duration, interpolate ) {
+   tacho.select(".tachoNeedle").transition().duration(duration).ease("in-out-bounce")
+      .attrTween("transform", function() {
+         return function(t) { return "rotate( " + (Tacho.ROTATION[0] + interpolate(t)) + " )";};
+   });
 }
 
 Tacho.prototype.toRadiant = function( value ) {

@@ -20,9 +20,11 @@ function load() {
    
    var tacho = new Tacho(); 
    tacho.initialize("tacho0", 400); 
-   tacho.update(75, 150);
+   tacho.update(7500, 10000);
    
 
+   setTimeout(function() { tacho.update(300, 10000)} , 5000);
+   setTimeout(function() { tacho.update(3000, 10000)} , 10000);
    setTimeout(stopLoading, 7000, chart, timer);
 }
 </script>
