@@ -1,27 +1,34 @@
 .tachoBorderIn {
-  fill: #eeeeff;
-  stroke-width: 2px;
-  stroke: #8888aa;
+  fill: #ffffff;
+  stroke-width: 1px;
+  stroke: #ffffff;
 }
 
-.tachoNeedle, .tachoValueRect, .tachoBorderOut {
-  stroke-width: 2px;
-  stroke: #8888aa;
-  fill: #000066;
+.tachoValueRect, .tachoBorderOut {
+  stroke-width: 1px;
+  stroke: #ffffff;
+  fill: #cccccc;
+}
+
+.tachoNeedle {
+  stroke-width: 1px;
+  stroke: #555555;
+  fill: #ff8c00;
 }
 
 .tachoScale, .tachoTick {
   fill: none;
-  stroke-width: 5px;
-  stroke: #00ffff;
+  stroke-width: 2px;
+  stroke: #555555;
 }
 
 .tachoTickLabel {
-   fill: black;
-   font-weight: bold;
+   fill: #333333;
+   font-size: 0.7em;
 }
 
 .tachoValue {
-   font-size: 1.8em;
+   fill: #333333;
+   font-size: 0.8em;
    font-weight: bold;
 }
