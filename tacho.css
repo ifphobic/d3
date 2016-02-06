@@ -6,13 +6,13 @@
 
 .tachoValueRect, .tachoBorderOut {
   stroke-width: 1px;
-  stroke: #ffffff;
+  stroke: #aaaaaa;
   fill: #cccccc;
 }
 
 .tachoNeedle {
   stroke-width: 1px;
-  stroke: #555555;
+  stroke: #888888;
   fill: #ff8c00;
 }
 
