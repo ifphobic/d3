@@ -191,9 +191,9 @@ Chart.prototype.startLoading = function() {
    return timer;
 }
 
-Chart.prototype.stopLoading = function( timer, chartObject ) {
+Chart.prototype.stopLoading = function( timer ) {
    window.clearInterval( timer );
-   chartObject.update( chartObject.createRandomData(20, true) );
+   this.update( this.createRandomData(20, true) );
 }
 
 Chart.prototype.createRandomData = function(size, zero) {

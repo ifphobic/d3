@@ -32,7 +32,7 @@ function load() {
 
    setTimeout(function() { tacho.update(3, 100)} , 5000);
    setTimeout(function() { tacho.update(30, 100)} , 10000);
-   setTimeout(chart.stopLoading, 7000, timer, chart);
+   setTimeout(function() { chart.stopLoading(timer)}, 7000);
 }
 </script>
 
