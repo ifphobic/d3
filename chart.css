@@ -1,12 +1,12 @@
-.axis path,
-.axis line {
+.chartAxis path,
+.chartAxis line {
   fill: none;
   stroke-width: 2px;
   stroke: #8888aa;
   shape-rendering: crispEdges;
 }
 
-.legend {
+.chartLegend {
    fill: #eeeeff;
 }
 
@@ -14,20 +14,20 @@ text {
    fill: #6666aa;
 }
 
-.bar0 {
+.chartBar0 {
    fill: #88cc88;
 }
-.bar1 {
+.chartBar1 {
    fill: #cc8888; 
 }
-.bar2 {
+.chartBar2 {
    fill: #8888ff;
 }
-.bar3 {
+.chartBar3 {
    fill: #ffcc88;
 }
 
-.line {
+.chartLine {
    fill: none;
    stroke: #ffcc88;
    stroke-width: 5px;
@@ -37,14 +37,14 @@ svg {
    background-color: white;
 }
 
-.title {
+.chartTitle {
    font-weight: bold;
    font-size: 30px;
    font-family: Sans-Serif;
    fill: #8888aa;
 }
 
-.subTitle {
+.chartSubTitle {
    font-weight: normal;
    font-size: 20px;
    font-family: Sans-Serif;

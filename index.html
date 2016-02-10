@@ -6,6 +6,7 @@
 
 <script src="lib/d3.min.js" ></script>
 <script src="chart.js" ></script>
+<script src="chartConfig.js" ></script>
 <script src="tacho.js" ></script>
 <script src="tachoConfig.js" ></script>
 <script>
@@ -16,8 +17,11 @@ function randomInt(max) {
 }
 
 function load() {
-   var chart = initializeChart("chart", 1200, 600);
-   var timer = startLoading( chart );
+   
+   var chartConfig = new ChartConfig();
+   var chart = new Chart();
+   chart.initialize("chart", chartConfig.getConfig());
+   var timer = chart.startLoading();
    
 
    var tachoConfig = new TachoConfig();
@@ -28,7 +32,7 @@ function load() {
 
    setTimeout(function() { tacho.update(3, 100)} , 5000);
    setTimeout(function() { tacho.update(30, 100)} , 10000);
-   setTimeout(stopLoading, 7000, chart, timer);
+   setTimeout(chart.stopLoading, 7000, timer, chart);
 }
 </script>
 

@@ -1,28 +1,29 @@
+function Chart() {
+}
 
-var margin = {top: 120, right: 60, bottom: 60, left: 40};
-var legendWidth = 250;
-var duration = 650;
+Chart.prototype.initialize = function( id, config ) {
+   
+   this.config = config;
+   var width = config.width;
+   var height = config.height;
 
-function initializeChart( id, width, height ) {
    var svg = d3.select( "#" + id )
       .attr("width", width )
       .attr("height", height );
 
-   width -= margin.left + margin.right;
-   height -= margin.top + margin.bottom;
+   width -= config.margin.left + config.margin.right;
+   height -= config.margin.top + config.margin.bottom;
 
-
-
-   var chart = svg.append("g")
+   this.chart = svg.append("g")
       .attr("width", width )
       .attr("height", height )
-      .attr("transform", "translate(" + margin.left + "," + margin.top +  ")");
+      .attr("transform", "translate(" + config.margin.left + "," + config.margin.top +  ")");
 
-   chart.append("g")
+   this.chart.append("g")
       .attr("class", "chartLayer");
     
-   chart.append("g")
-      .attr("class", "yAxis axis");
+   this.chart.append("g")
+      .attr("class", "chartYAxis chartAxis");
 
    var y = d3.scale.linear()
       .domain([ 0, 1 ])
@@ -34,82 +35,78 @@ function initializeChart( id, width, height ) {
       .tickFormat(formatPercent)
       .orient("right");
 
-   chart.append("g")
+   this.chart.append("g")
       .attr("transform", "translate(" + width +  ", 0)")
-      .attr("class", "yAxis2 axis")
+      .attr("class", "chartYAxis2 chartAxis")
       .call(yAxis);
 
 
-   chart.append("g")
+   this.chart.append("g")
       .attr("transform", "translate(0," + height +  ")")
-      .attr("class", "xAxis axis");
+      .attr("class", "chartXAxis chartAxis");
 
-   chart.append("path")
-      .attr("class", "line");
+   this.chart.append("path")
+      .attr("class", "chartLine");
  
-   var legend = chart.append("g")
-      .attr("transform", "translate( " + (width - legendWidth ) + ", -100 )")
-      .attr("class", "legend");
+   var legend = this.chart.append("g")
+      .attr("transform", "translate( " + (width - config.legendWidth ) + ", -100 )")
+      .attr("class", "chartLegend");
 
    legend.append("rect")
-      .attr("class", "legend");
+      .attr("class", "chartLegend");
 
-   var title = chart.append("g")
+   var title = this.chart.append("g")
    title.append("text")
-      .attr("class", "title")
+      .attr("class", "chartTitle")
       .attr("transform", "translate( 0 , -60 )");
   
    title.append("text")
-      .attr("class", "subTitle")
+      .attr("class", "chartSubTitle")
       .attr("transform", "translate( 0 , -40 )");
-  
-   
-
-   return chart;
 }
 
-function updateChart( chart, data ) {
+Chart.prototype.update = function( data ) {
    
-   var width = chart.attr( "width" );
-   var height = chart.attr( "height" );
+   var width = this.chart.attr( "width" );
+   var height = this.chart.attr( "height" );
    var barWidth = width / data.dataArray.length;
   
-   chart.select(".title").text( data.title[0] );
-   chart.select(".subTitle").text( data.title[1] );
+   this.chart.select(".chartTitle").text( data.title[0] );
+   this.chart.select(".chartSubTitle").text( data.title[1] );
 
-   updateAxis(chart, width, height, data );
-   updateLegend(chart, data);
+   this.updateAxis( width, height, data );
+   this.updateLegend( data);
 
    var y = d3.scale.linear()
       .domain([ 0, data.maxValue ])
       .range([0, height]);
 
-   var dataJoin = chart.select(".chartLayer").selectAll(".bar").data(data.dataArray);
+   var dataJoin = this.chart.select(".chartLayer").selectAll(".chartBar").data(data.dataArray);
    var bar = dataJoin.enter().append("g")
-      .attr("class", "bar");
+      .attr("class", "chartBar");
    
-   bar.append("rect").attr("class", "bar0")
+   bar.append("rect").attr("class", "chartBar0")
    .attr("width", barWidth - 4 )
    .attr("x", function( d, i ) { return i * barWidth + 2; });
    
-   bar.append("rect").attr("class", "bar1")
+   bar.append("rect").attr("class", "chartBar1")
    .attr("width", barWidth - 4 )
    .attr("x", function( d, i ) { return i * barWidth + 2; });
    
-   bar.append("rect").attr("class", "bar2")
+   bar.append("rect").attr("class", "chartBar2")
    .attr("width", barWidth - 4 )
    .attr("x", function( d, i ) { return i * barWidth + 2; });
 
 
-   dataJoin.select(".bar0").transition().duration(duration)
+   dataJoin.select(".chartBar0").transition().duration( this.config.changeDuration )
       .attr("height", function( d ) { return y( d[1] ) }  )
       .attr("y", function( d, i ) { return height - y( d[1] ) });
 
-   dataJoin.select(".bar1").transition().duration(duration)
+   dataJoin.select(".chartBar1").transition().duration(this.config.changeDuration)
       .attr("height", function( d ) { return y( d[2] ) }  )
       .attr("y", function( d, i ) { return height - y( d[1] + d[2]) });
 
-   dataJoin.select(".bar2").transition().duration(duration)
+   dataJoin.select(".chartBar2").transition().duration(this.config.changeDuration)
       .attr("height", function( d ) { return y( d[3] ) }  )
       .attr("y", function( d, i ) { return height - y( d[1] + d[2] + d[3]) });
 
@@ -126,13 +123,13 @@ function updateChart( chart, data ) {
          return height - y( d[1] / summe * data.maxValue );
       });
 
-   chart.select(".line")
-      .datum(data.dataArray).transition().duration(duration)
+   this.chart.select(".chartLine")
+      .datum(data.dataArray).transition().duration(this.config.changeDuration)
       .attr("d", line);
 
 }
 
-function updateAxis( chart, width, height, data ) {
+Chart.prototype.updateAxis = function( width, height, data ) {
    
    var x = d3.scale.ordinal()
                .domain( data.dataArray.map( function (d) { return d[0]; } ))
@@ -143,7 +140,7 @@ function updateAxis( chart, width, height, data ) {
        .ticks( data.dataArray.length )
        .orient("bottom");
 
-   chart.select("g.xAxis").call(xAxis)
+   this.chart.select("g.chartXAxis").call(xAxis)
       .selectAll("text")
          .attr("transform", "translate( 15, 12) rotate(45)" );
 
@@ -155,47 +152,51 @@ function updateAxis( chart, width, height, data ) {
        .scale(y)
        .orient("left");
    
-   chart.select("g.yAxis").call(yAxis);
+   this.chart.select("g.chartYAxis").call(yAxis);
 }
 
-function updateLegend( chart, data ) {
+Chart.prototype.updateLegend = function( data ) {
 
    var lineHeight = 20;
 
-   var legend = chart.select(".legend").selectAll(".legendText").data( data.legend );
+   var legend = this.chart.select(".chartLegend").selectAll(".chartLegendText").data( data.legend );
 
-   var background = chart.select(".legend").select(".legend")
+   var background = this.chart.select(".chartLegend").select(".chartLegend")
    .attr("width", 250)
    .attr("height", lineHeight * data.legend.length + 10 );
 
    legend.enter().append("text")
-     .attr("class", "legendText")
+     .attr("class", "chartLegendText")
      .attr("x", 30)
      .attr("y", function(d, i) {return lineHeight * i + 20 }  )
      .text( function(d) {return d } );
 
    legend.enter().append("rect")
-     .attr("class", function(d, i) {return "bar" + i }  )
+     .attr("class", function(d, i) {return "chartBar" + i }  )
      .attr("x", 10)
      .attr("y", function(d, i) {return lineHeight * i + 10 })
      .attr("width", 10)
      .attr("height", 10);
 }
 
-function startLoading( chart ) {
-   updateChart( chart, createRandomData(20, true) );
+
+
+Chart.prototype.startLoading = function() {
+   this.update( this.createRandomData(20, true) );
+
+   var chartObject = this;
    var timer = setInterval(function(){
-      updateChart( chart, createRandomData(20, false) ) ;
+      chartObject.update( chartObject.createRandomData(20, false) ) ;
    }, 700);
    return timer;
 }
 
-function stopLoading( chart, timer ) {
+Chart.prototype.stopLoading = function( timer, chartObject ) {
    window.clearInterval( timer );
-   updateChart( chart, createRandomData(20, true) );
+   chartObject.update( chartObject.createRandomData(20, true) );
 }
 
-function createRandomData(size, zero) {
+Chart.prototype.createRandomData = function(size, zero) {
    var dataArray = new Array();
 
    var maxValue = 0;  
@@ -230,7 +231,7 @@ function createRandomData(size, zero) {
    return data;
 }
 
-function randomInt(max) {
+Chart.prototype.randomInt = function(max) {
    return Math.floor((Math.random() * (max + 1)) ); 
 }
 
