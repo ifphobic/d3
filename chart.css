@@ -6,8 +6,10 @@
   shape-rendering: crispEdges;
 }
 
-.chartLegend {
-   fill: #eeeeff;
+.chartLegendRect {
+   stroke-width: 1px;
+   stroke: #8888aa;
+   fill: none;
 }
 
 text {

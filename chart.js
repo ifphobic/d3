@@ -53,7 +53,7 @@ Chart.prototype.initialize = function( id, config ) {
       .attr("class", "chartLegend");
 
    legend.append("rect")
-      .attr("class", "chartLegend");
+      .attr("class", "chartLegendRect");
 
    var title = this.chart.append("g")
    title.append("text")
@@ -161,7 +161,7 @@ Chart.prototype.updateLegend = function( data ) {
 
    var legend = this.chart.select(".chartLegend").selectAll(".chartLegendText").data( data.legend );
 
-   var background = this.chart.select(".chartLegend").select(".chartLegend")
+   var background = this.chart.select(".chartLegend").select(".chartLegendRect")
    .attr("width", 250)
    .attr("height", lineHeight * data.legend.length + 10 );
 
