@@ -25,13 +25,20 @@ function load() {
    
 
    var tachoConfig = new TachoConfig();
-   var tacho = new Tacho(); 
-   tacho.initialize("tacho0", tachoConfig.getConfig()); 
-   tacho.update(75, 100);
+   var tacho0 = new Tacho(); 
+   tacho0.initialize("tacho0", tachoConfig.getConfig()); 
+   tacho0.update(75, 100);
+   var tacho1 = new Tacho(); 
+   tacho1.initialize("tacho1", tachoConfig.getConfig()); 
+   tacho1.update(45, 100);
+   var tacho2 = new Tacho(); 
+   tacho2.initialize("tacho2", tachoConfig.getConfig()); 
+   tacho2.update(15, 100);
    
 
-   setTimeout(function() { tacho.update(3, 100)} , 5000);
-   setTimeout(function() { tacho.update(30, 100)} , 10000);
+   setTimeout(function() { tacho0.update(3, 100)} , 5000);
+   setTimeout(function() { tacho1.update(30, 100)} , 6000);
+   setTimeout(function() { tacho2.update(100, 100)} , 8000);
    setTimeout(function() { chart.stopLoading(timer)}, 7000);
 }
 </script>
@@ -39,7 +46,9 @@ function load() {
 <body onload="load()">
 
    <svg id="tacho0"></svg>
-
+   <svg id="tacho1"></svg>
+   <svg id="tacho2"></svg>
+   <br>
    <svg id="chart" ></svg>
 
 </body>
